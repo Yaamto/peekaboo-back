@@ -8,6 +8,7 @@ const UserSchema = new Schema(
         username: {
             type: String,
             required: true,
+            unique: true
         },
         email: {
             type: String,
@@ -22,9 +23,25 @@ const UserSchema = new Schema(
             type: Boolean,
             default: false,
         },
-        profilePic : {
+        profilePic: {
             type: String,
+        },
+        bio: {
+          type: String
+        },
+        followers: {
+          type: [String]
+        },
+        following: {
+          type: [String]
+        },
+        likes: {
+          type: [String]
         }
+        
+        },
+        {
+          timestamps: true,
         })
         UserSchema.pre("save", async function(next) {
             const salt = await bcrypt.genSalt();
