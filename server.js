@@ -1,8 +1,11 @@
 const express = require('express');
 require('dotenv').config()
 require('./config/config')
+
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+
+const authRoutes = require("./routes/authRoutes")
 // const { requireAuth, checkUser, checkAdmin } = require('./middleware/auth');
 const app = express()
 
@@ -27,7 +30,7 @@ app.use(cookieParser())
 //    app.get("/jwtid/admin", checkAdmin, (req, res) => {
 //     return res.status(200).json({user : res.locals.user})
 //     });
-
+app.use("/auth", authRoutes)
 
 
 app.listen(3000, () => console.log("serveur running on port 3000"));
