@@ -65,3 +65,18 @@ module.exports.editUserProfilePic = async(req,res) => {
         res.status(404).send({err: err})
     }
 }
+
+module.exports.getAllUsers = async(req,res) => {
+
+    try {
+        const data = await User.find().select('-password')
+        if(data){
+            res.status(200).json(data)
+        }else {
+            res.status(404).json({erreur : "pas d'utilisateur"})
+        }
+    }
+    catch(err){
+        console.log(err)
+    }
+}
