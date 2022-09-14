@@ -116,8 +116,6 @@ const id = res.locals.user._id
        }else {
         res.json(err)
        }
-
-       
  }
  catch(erreur){
     console.log(erreur)
