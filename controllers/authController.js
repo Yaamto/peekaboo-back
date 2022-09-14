@@ -19,7 +19,6 @@ module.exports.register = (req, res) => {
             return res.status(200).json({msg: newUser})
         }
     })
-
 }
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;

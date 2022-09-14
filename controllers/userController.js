@@ -86,8 +86,7 @@ module.exports.addProfilePic = async(req, res) => {
 
 const id = res.locals.user._id
  let filename = '';
-console.log(req.files)
-
+ 
  if (req.files) {
   
      let file = req.files.file;
