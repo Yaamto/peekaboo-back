@@ -14,8 +14,6 @@ module.exports.register = (req, res) => {
                 username: req.body.username,
                 email: req.body.email,
                 password: req.body.password,
-                bio: req.body.bio,
-                profilePic: req.body.profilePic
             })
             newUser.save()
             return res.status(200).json({msg: newUser})
@@ -42,7 +40,6 @@ module.exports.login = async(req,res) => {
         const token = createToken(user._id);
         res.cookie('jwt', token, { httpOnly: true, maxAge});
         res.status(200).json({ user: user, token : token})
-   
       }
       catch(err) {
           console.error(err)

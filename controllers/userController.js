@@ -1,4 +1,5 @@
 const User = require("../models/userModel").User
+const {isEmpty} = require('../config/customFunction');
 
 
 module.exports.deleteUser = async(req,res) => {
@@ -79,4 +80,45 @@ module.exports.getAllUsers = async(req,res) => {
     catch(err){
         console.log(err)
     }
+}
+
+module.exports.addProfilePic = async(req, res) => {
+
+const id = res.locals.user._id
+ let filename = '';
+console.log(req.files)
+
+ if (req.files) {
+  
+     let file = req.files.file;
+     filename = file.name;
+     let uploadDir = './files/';
+
+     file.mv(uploadDir + filename, (err) => {
+         if (err)
+             console.log('big erreur lol')
+     });
+ }else {
+    console.log("le fichier n'est pas pris en compte")
+ }
+    
+ try {
+    const data = await User.findByIdAndUpdate(
+        {_id: id},
+        {
+            $set: {
+                profilePic: `/files/${filename}`
+            }
+        },
+        { new: true, upsert: true, setDefaultsOnInsert: true}
+       )
+       if (data){
+        res.json(data)
+       }else {
+        res.json(err)
+       }
+ }
+ catch(erreur){
+    console.log(erreur)
+ }
 }

@@ -1,7 +1,7 @@
 const express = require('express');
 require('dotenv').config()
 require('./config/config')
-
+const fileUpload = require('express-fileupload');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 
@@ -10,7 +10,7 @@ const userRoutes = require("./routes/userRoutes")
 // const { requireAuth, checkUser, checkAdmin } = require('./middleware/auth');
 const app = express()
 
-
+app.use(fileUpload());
 app.use(
     cors({
       origin: (origin, callback) => callback(null, true),
@@ -22,6 +22,7 @@ app.use(
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
 app.use(cookieParser())
+app.use(express.static("public"));
 
 
 // app.get("/jwtid", checkUser, (req, res) => {
