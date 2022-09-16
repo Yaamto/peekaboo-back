@@ -37,6 +37,9 @@ const UserSchema = new Schema(
         },
         likes: {
           type: [String]
+        },
+        reposter: {
+          type: [String]
         }
         
         },
