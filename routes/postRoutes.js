@@ -5,6 +5,7 @@ const postController = require('../controllers/postController')
 
 router.post('/addPost', checkUser, postController.addPost)
 router.post('/deletePost', checkUser, postController.deletePost)
+router.post('/editPost', checkUser, postController.editPost)
 router.post('/likePost', checkUser, postController.likePost)
 
 module.exports = router

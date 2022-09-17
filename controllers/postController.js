@@ -10,7 +10,7 @@ module.exports.addPost = async(req, res) => {
             const newPost = await Post.create({
                 poster_id: id,
                 content: content,
-                image_content: image_content
+                image_content: image_content ? image_content : ""
             })
             return res.status(200).json({msg: newPost})
         } else {
@@ -30,6 +30,24 @@ module.exports.deletePost = async(req, res) => {
             return res.status(200).json({msg: "Delete successful"})    
         } else {
             return res.status(500).json({error: "Invalid post Id, post already deleted, or this post isn't yours"})
+        }
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+module.exports.editPost = async(req, res) => {
+    const id = res.locals.user._id
+    const { post_id, content, image_content } = req.body
+    try {
+        const post = await Post.findById(post_id)
+        if (post && post.poster_id.toString() === id.toString()) {
+            post.content = content ? content : ""
+            post.image_content = image_content ? image_content : "" 
+            post.save()
+            res.status(200).json({msg: "Post updated successfully"})
+        } else {
+            res.status(500).json({error: "Post has not been updated. Check your content"})
         }
     } catch(err) {
         console.log(err)
