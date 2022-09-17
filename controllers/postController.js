@@ -25,8 +25,8 @@ module.exports.deletePost = async(req, res) => {
     const id = res.locals.user._id
     try {
         const post = await Post.findById(req.body.post_id)
-        if(post && toString(post.poster_id) == toString(id)) {
-            await Post.findByIdAndDelete(post._id)
+        if(post && post.poster_id.toString() === id.toString()) {
+            await post.delete()
             return res.status(200).json({msg: "Delete successful"})    
         } else {
             return res.status(500).json({error: "Invalid post Id, post already deleted, or this post isn't yours"})
