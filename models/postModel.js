@@ -12,7 +12,7 @@ const PostSchema = new Schema(
       max: 280,
       required: true,
     },
-    image_content: {
+    media: {
       type: String
     },
     likes: [

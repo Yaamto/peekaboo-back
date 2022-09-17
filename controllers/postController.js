@@ -4,13 +4,13 @@ const { isEmpty } = require("../config/customFunction");
 
 module.exports.addPost = async(req, res) => {
     const id = res.locals.user._id
-    const { content, image_content } = req.body
+    const { content, media } = req.body
     try {
         if (content) {
             const newPost = await Post.create({
                 poster_id: id,
                 content: content,
-                image_content: image_content ? image_content : ""
+                media: media ? media : ""
             })
             return res.status(200).json({msg: newPost})
         } else {
@@ -38,12 +38,12 @@ module.exports.deletePost = async(req, res) => {
 
 module.exports.editPost = async(req, res) => {
     const id = res.locals.user._id
-    const { post_id, content, image_content } = req.body
+    const { post_id, content, media } = req.body
     try {
         const post = await Post.findById(post_id)
         if (post && post.poster_id.toString() === id.toString()) {
             post.content = content ? content : ""
-            post.image_content = image_content ? image_content : "" 
+            post.media = media ? media : "" 
             post.edited = true
             post.save()
             res.status(200).json({msg: "Post updated successfully"})
