@@ -44,6 +44,7 @@ module.exports.editPost = async(req, res) => {
         if (post && post.poster_id.toString() === id.toString()) {
             post.content = content ? content : ""
             post.image_content = image_content ? image_content : "" 
+            post.edited = true
             post.save()
             res.status(200).json({msg: "Post updated successfully"})
         } else {

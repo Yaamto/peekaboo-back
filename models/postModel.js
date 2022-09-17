@@ -13,7 +13,7 @@ const PostSchema = new Schema(
       required: true,
     },
     image_content: {
-      type: String,
+      type: String
     },
     likes: [
       {
@@ -27,6 +27,10 @@ const PostSchema = new Schema(
         ref: "comment",
       },
     ],
+    edited: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true,
