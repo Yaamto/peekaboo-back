@@ -22,10 +22,10 @@ module.exports.addPost = async(req, res) => {
 }
 
 module.exports.deletePost = async(req, res) => {
-    const id = res.locals.user._id
+    const {_id, isAdmin} = res.locals.user
     try {
         const post = await Post.findById(req.body.post_id)
-        if(post && post.poster_id.toString() === id.toString()) {
+        if(post && post.poster_id.toString() === _id.toString() || isAdmin === true) {
             await post.delete()
             return res.status(200).json({msg: "Delete successful"})    
         } else {
