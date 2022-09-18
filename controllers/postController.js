@@ -1,14 +1,14 @@
 const Post = require("../models/postModel").Post;
 const { isEmpty } = require("../config/customFunction");
 
-
+//POST
 module.exports.addPost = async(req, res) => {
     const id = res.locals.user._id
     const { content, media } = req.body
     try {
         if (content) {
             const newPost = await Post.create({
-                poster_id: id,
+                poster: id,
                 content: content,
                 media: media ? media : ""
             })
@@ -21,11 +21,12 @@ module.exports.addPost = async(req, res) => {
     }
 }
 
+//POST
 module.exports.deletePost = async(req, res) => {
     const {_id, isAdmin} = res.locals.user
     try {
         const post = await Post.findById(req.body.post_id)
-        if(post && post.poster_id.toString() === _id.toString() || isAdmin === true) {
+        if(post && post.poster.toString() === _id.toString() || isAdmin === true) {
             await post.delete()
             return res.status(200).json({msg: "Delete successful"})    
         } else {
@@ -36,14 +37,14 @@ module.exports.deletePost = async(req, res) => {
     }
 }
 
+//POST
 module.exports.editPost = async(req, res) => {
     const id = res.locals.user._id
     const { post_id, content, media } = req.body
     try {
         const post = await Post.findById(post_id)
-        if (post && post.poster_id.toString() === id.toString()) {
+        if (post && post.poster.toString() === id.toString()) {
             post.content = content ? content : post.content
-            post.media = media ? media : post.media
             post.edited = true
             post.save()
             res.status(200).json({msg: "Post updated successfully"})
@@ -55,22 +56,48 @@ module.exports.editPost = async(req, res) => {
     }
 }
 
+//POST
 module.exports.likePost = async(req, res) => {
     const id = res.locals.user._id
     try {
         const post = await Post.findById(req.body.post_id)
-        if(post && !post.likes.includes(id)){
-            post.likes.push(id)
-            post.save()
-            return res.status(200).json({msg: "Like added", post: post})
-            
-        } else if (post.likes.includes(id)) {
-            const indexOf = post.likes.indexOf(id)
-            post.likes.splice(indexOf, 1)
-            post.save()
-            return res.status(200).json({msg: "Like removed", post: post})
+
+        if(post) {
+            if(!post.likes.includes(id)){
+                post.likes.push(id)
+                post.save()
+                return res.status(200).json({msg: "Like added", post: post})
+                
+            } else {
+                const indexOf = post.likes.indexOf(id)
+                post.likes.splice(indexOf, 1)
+                post.save()
+                return res.status(200).json({msg: "Like removed", post: post})
+            }
         } else {
-            return res.status(500).json({error: "post not found"})
+            return res.status(500).json({error: "Post not found"})
+        }
+
+
+
+        
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+//GET
+
+module.exports.singlePost = async(req, res) => {
+    try {
+        const post = await Post.findById(req.body.post_id)
+        .populate({ path: 'poster', select: '_id username isAdmin' })
+        .populate({ path: 'likes', select: '_id username' })
+        // .populate({ path: 'comments', select: '_id username isAdmin' })
+        if (post) {
+            return res.status(200).json({data: post})
+        } else {
+            return res.status(500).json({error: "This post does not exist."})
         }
     } catch(err) {
         console.log(err)
