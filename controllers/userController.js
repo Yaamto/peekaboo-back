@@ -27,12 +27,16 @@ module.exports.getSingleUser = async(req, res) => {
 module.exports.deleteUser = async (req, res) => {
   const id = req.params.id;
   try {
-    const data = await User.findByIdAndDelete({ _id: id });
+    if(req.params.id.toString() == res.locals.user._id.toString()) {
+      const data = await User.findByIdAndDelete({ _id: id });
 
-    if (data) {
-      res.status(200).send({ deleted: data });
+      if (data) {
+        res.status(200).send({ deleted: data });
+      } else {
+        res.status(404);
+      }
     } else {
-      res.status(404);
+      res.status(404).json({ erreur: "you are not authorized to perform this action" });
     }
   } catch (err) {
     res.status(404).send({ err: err });
@@ -43,19 +47,23 @@ module.exports.editUserBio = async (req, res) => {
   const bio = req.body.bio;
   const id = req.params.id;
   try {
-    const data = await User.findByIdAndUpdate(
-      { _id: id },
-      {
-        $set: {
-          bio: bio,
+    if(req.params.id.toString() == res.locals.user._id.toString()) {
+      const data = await User.findByIdAndUpdate(
+        { _id: id },
+        {
+          $set: {
+            bio: bio,
+          },
         },
-      },
-      { new: true, upsert: true, setDefaultsOnInsert: true }
-    );
-    if (data) {
-      res.json(data);
+        { new: true, upsert: true, setDefaultsOnInsert: true }
+      );
+      if (data) {
+        res.json(data);
+      } else {
+        res.json(err);
+      }
     } else {
-      res.json(err);
+      res.status(498).json({error: "You can only edit you profile."})
     }
   } catch (err) {
     res.status(404).send({ err: err });
@@ -66,19 +74,23 @@ module.exports.editUserProfilePic = async (req, res) => {
   const profilePic = req.body.profilePic;
   const id = req.params.id;
   try {
-    const data = await User.findByIdAndUpdate(
-      { _id: id },
-      {
-        $set: {
-          profilePic: profilePic,
+    if(req.params.id.toString() == res.locals.user._id.toString()) {
+      const data = await User.findByIdAndUpdate(
+        { _id: id },
+        {
+          $set: {
+            profilePic: profilePic,
+          },
         },
-      },
-      { new: true, upsert: true, setDefaultsOnInsert: true }
-    );
-    if (data) {
-      res.json(data);
+        { new: true, upsert: true, setDefaultsOnInsert: true }
+      );
+      if (data) {
+        res.json(data);
+      } else {
+        res.json(err);
+      }
     } else {
-      res.json(err);
+      res.status(498).json({error: "You can only edit you profile."})
     }
   } catch (err) {
     res.status(404).send({ err: err });
@@ -87,11 +99,15 @@ module.exports.editUserProfilePic = async (req, res) => {
 
 module.exports.getAllUsers = async (req, res) => {
   try {
-    const data = await User.find().select("-password");
-    if (data) {
-      res.status(200).json(data);
+    if(res.locals.user.isAdmin) {
+      const data = await User.find().select("-password");
+      if (data) {
+        res.status(200).json(data);
+      } else {
+        res.status(404).json({ erreur: "no user" });
+      }
     } else {
-      res.status(404).json({ erreur: "pas d'utilisateur" });
+        res.status(404).json({ erreur: "you are not authorized to perform this action" });
     }
   } catch (err) {
     console.log(err);
@@ -115,19 +131,23 @@ module.exports.addProfilePic = async (req, res) => {
   }
 
   try {
-    const data = await User.findByIdAndUpdate(
-      { _id: id },
-      {
-        $set: {
-          profilePic: `/files/${filename}`,
+    if(req.params.id.toString() == res.locals.user._id.toString()) {
+      const data = await User.findByIdAndUpdate(
+        { _id: id },
+        {
+          $set: {
+            profilePic: `/files/${filename}`,
+          },
         },
-      },
-      { new: true, upsert: true, setDefaultsOnInsert: true }
-    );
-    if (data) {
-      res.json(data);
+        { new: true, upsert: true, setDefaultsOnInsert: true }
+      );
+      if (data) {
+        res.json(data);
+      } else {
+        res.json(err);
+      }
     } else {
-      res.json(err);
+      res.status(404).json({ erreur: "you are not authorized to perform this action" });
     }
   } catch (erreur) {
     console.log(erreur);
