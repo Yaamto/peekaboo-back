@@ -21,6 +21,12 @@ const PostSchema = new Schema(
         ref: "user",
       },
     ],
+    reposters: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+      },
+    ],
     comments: [
       {
         type: mongoose.Schema.Types.ObjectId,

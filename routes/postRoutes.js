@@ -12,7 +12,7 @@ router.post('/likePost', checkUser, postController.likePost)
 
 
 //GET
-router.get('/singlePost', postController.singlePost)
+router.get('/singlePost/:post_id', postController.singlePost)
 
 
 

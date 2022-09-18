@@ -95,7 +95,7 @@ module.exports.likePost = async(req, res) => {
 
 module.exports.singlePost = async(req, res) => {
     try {
-        const post = ObjectId.isValid(req.body.post_id) ? await Post.findById(req.body.post_id)
+        const post = ObjectId.isValid(req.params.post_id) ? await Post.findById(req.body.post_id)
         .populate({ path: 'poster', select: '_id username isAdmin' })
         .populate({ path: 'likes', select: '-password' }) 
         // .populate({ path: 'comments', select: '_id username isAdmin' })
@@ -104,7 +104,7 @@ module.exports.singlePost = async(req, res) => {
         if (post) {
             return res.status(200).json({data: post})
         } else {
-            return res.status(500).json({error: "This post does not exist."})
+            return res.status(500).json({error: "This post does not exist, or has been removed by his poster."})
         }
     } catch(err) {
         console.log(err)
