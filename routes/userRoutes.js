@@ -11,5 +11,6 @@ router.put("/editbio/:id", userController.editUserBio)
 router.put("/editprofilepic/:id", userController.editUserProfilePic)
 router.get("/users", userController.getAllUsers)
 router.put("/addProfilePic", checkUser, userController.addProfilePic)
+router.patch("/follow/:id", checkUser, userController.follow)
 
 module.exports = router

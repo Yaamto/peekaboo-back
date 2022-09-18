@@ -1,4 +1,5 @@
 const Post = require("../models/postModel").Post;
+const User = require("../models/userModel").User;
 const { isEmpty } = require("../config/customFunction");
 const ObjectId = require('mongoose').Types.ObjectId;
 
@@ -62,26 +63,29 @@ module.exports.likePost = async(req, res) => {
     const id = res.locals.user._id
     try {
         const post = await Post.findById(req.body.post_id)
-
-        if(post) {
-            if(!post.likes.includes(id)){
+        const currentUser = await User.findById(id)
+        console.log(currentUser.likes)
+        if(post && currentUser) {
+            if(!post.likes.includes(id) && !currentUser.likes.includes(post._id)){
                 post.likes.push(id)
+                currentUser.likes.push(post._id)
                 post.save()
+                currentUser.save()
                 return res.status(200).json({msg: "Like added", post: post})
                 
             } else {
-                const indexOf = post.likes.indexOf(id)
-                post.likes.splice(indexOf, 1)
+                const indexOfUserLike = post.likes.indexOf(id)
+                const indexOfPostLike = currentUser.likes.indexOf(post._id)
+                post.likes.splice(indexOfUserLike, 1)
+                currentUser.likes.splice(indexOfPostLike, 1)
                 post.save()
+                currentUser.save()
                 return res.status(200).json({msg: "Like removed", post: post})
             }
         } else {
-            return res.status(500).json({error: "Post not found"})
+            return res.status(500).json({error: "Post not found or you're not logged in"})
         }
 
-
-
-        
     } catch(err) {
         console.log(err)
     }
