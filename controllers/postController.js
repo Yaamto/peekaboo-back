@@ -1,5 +1,6 @@
 const Post = require("../models/postModel").Post;
 const { isEmpty } = require("../config/customFunction");
+const ObjectId = require('mongoose').Types.ObjectId;
 
 //POST
 module.exports.addPost = async(req, res) => {
@@ -90,10 +91,12 @@ module.exports.likePost = async(req, res) => {
 
 module.exports.singlePost = async(req, res) => {
     try {
-        const post = await Post.findById(req.body.post_id)
+        const post = ObjectId.isValid(req.body.post_id) ? await Post.findById(req.body.post_id)
         .populate({ path: 'poster', select: '_id username isAdmin' })
-        .populate({ path: 'likes', select: '_id username' })
+        .populate({ path: 'likes', select: '-password' }) 
         // .populate({ path: 'comments', select: '_id username isAdmin' })
+        : null
+        
         if (post) {
             return res.status(200).json({data: post})
         } else {
