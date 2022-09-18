@@ -13,6 +13,7 @@ router.post('/likePost', checkUser, postController.likePost)
 
 //GET
 router.get('/singlePost', postController.singlePost)
+router.get('/streamPosts', checkUser, postController.streamPosts)
 
 
 
