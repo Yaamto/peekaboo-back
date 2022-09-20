@@ -72,9 +72,9 @@ module.exports.editUserBio = async (req, res) => {
 
 module.exports.editUserProfilePic = async (req, res) => {
   const profilePic = req.body.profilePic;
-  const id = req.params.id;
+  const id = res.locals.user._id;
   try {
-    if(req.params.id.toString() == res.locals.user._id.toString()) {
+
       const data = await User.findByIdAndUpdate(
         { _id: id },
         {
@@ -89,9 +89,7 @@ module.exports.editUserProfilePic = async (req, res) => {
       } else {
         res.json(err);
       }
-    } else {
-      res.status(403).json({error: "You can only edit you profile."})
-    }
+
   } catch (err) {
     res.status(404).send({ err: err });
   }
@@ -131,7 +129,6 @@ module.exports.addProfilePic = async (req, res) => {
   }
 
   try {
-    if(req.params.id.toString() == res.locals.user._id.toString()) {
       const data = await User.findByIdAndUpdate(
         { _id: id },
         {
@@ -146,9 +143,7 @@ module.exports.addProfilePic = async (req, res) => {
       } else {
         res.json(err);
       }
-    } else {
-      res.status(403).json({ erreur: "you are not authorized to perform this action" });
-    }
+
   } catch (erreur) {
     console.log(erreur);
   }
