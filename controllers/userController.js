@@ -1,7 +1,7 @@
 const User = require("../models/userModel").User;
 const Post = require("../models/postModel").Post;
-const { isEmpty } = require("../config/customFunction");
 const ObjectId = require('mongoose').Types.ObjectId;
+const { isEmpty } = require("../config/customFunction");
 
 
 module.exports.getSingleUser = async(req, res) => {
@@ -19,7 +19,7 @@ module.exports.getSingleUser = async(req, res) => {
     // .populate({ path : 'repost', populate : { path : 'comments', select: '_id username' }})
     return res.status(200).json(user)
   } else {
-    return res.status(400).json({error: "user id not valid or missing."})  
+    return res.status(401).json({error: "user id not valid or missing."})  
   }
 }
 
@@ -36,7 +36,7 @@ module.exports.deleteUser = async (req, res) => {
         res.status(404);
       }
     } else {
-      res.status(404).json({ erreur: "you are not authorized to perform this action" });
+      res.status(403).json({ erreur: "you are not authorized to perform this action" });
     }
   } catch (err) {
     res.status(404).send({ err: err });
@@ -63,7 +63,7 @@ module.exports.editUserBio = async (req, res) => {
         res.json(err);
       }
     } else {
-      res.status(498).json({error: "You can only edit you profile."})
+      res.status(403).json({error: "You can only edit you profile."})
     }
   } catch (err) {
     res.status(404).send({ err: err });
@@ -90,7 +90,7 @@ module.exports.editUserProfilePic = async (req, res) => {
         res.json(err);
       }
     } else {
-      res.status(498).json({error: "You can only edit you profile."})
+      res.status(403).json({error: "You can only edit you profile."})
     }
   } catch (err) {
     res.status(404).send({ err: err });
@@ -107,7 +107,7 @@ module.exports.getAllUsers = async (req, res) => {
         res.status(404).json({ erreur: "no user" });
       }
     } else {
-        res.status(404).json({ erreur: "you are not authorized to perform this action" });
+        res.status(403).json({ erreur: "you are not authorized to perform this action" });
     }
   } catch (err) {
     console.log(err);
@@ -147,7 +147,7 @@ module.exports.addProfilePic = async (req, res) => {
         res.json(err);
       }
     } else {
-      res.status(404).json({ erreur: "you are not authorized to perform this action" });
+      res.status(403).json({ erreur: "you are not authorized to perform this action" });
     }
   } catch (erreur) {
     console.log(erreur);
@@ -161,26 +161,27 @@ module.exports.follow = async(req, res) => {
     if (selfUser && followedUser) {
       if (!selfUser.following.includes(followedUser._id) && !followedUser.followers.includes(selfUser._id)) {
         if(selfUser._id.toString() != req.params.id.toString()) {
-          selfUser.following.push(followedUser._id)
-          selfUser.save();
-          followedUser.followers.push(selfUser._id)
-          followedUser.save();
+
+          await User.findByIdAndUpdate(res.locals.user._id, {$push: {following: followedUser._id}})
+          await User.findByIdAndUpdate(req.params.id, {$push: {followers: selfUser._id}})
           return res.status(200).json({ msg: "You are now following this user" });
+          
         } else {
+
           return res.status(200).json({ error: "You cannot follow yourself" });
+
         }
       } else {
-
-        followingIndex = selfUser.following.indexOf(followedUser._id);
-        followersIndex = followedUser.followers.indexOf(selfUser._id);
-        selfUser.following.splice(followingIndex, 1)
-        selfUser.save();
-        followedUser.followers.splice(followersIndex, 1)
-        followedUser.save();
+        await User.findByIdAndUpdate(res.locals.user._id, {$pull: {following: {$eq: followedUser._id}}});
+        await User.findByIdAndUpdate(req.params.id, {$pull: {followers: {$eq: selfUser._id}}})
+        
         return res.status(200).json({ msg: "You are now un-following this user" });
+        
       }
     } else {
+      
       return res.status(200).json({ error: "User does not exist." });
+      
     }
   } catch (err) {
     return res.json(err)
@@ -194,16 +195,16 @@ module.exports.repost = async(req, res) => {
   try {
     if(selfUser && post) {
       if(!selfUser.repost.includes(post._id)) {
-        selfUser.repost.push(post._id)
-        post.reposters.push(selfUser._id)
-        selfUser.save()
-        post.save()
+
+        await User.findByIdAndUpdate(res.locals.user._id, {$push: {repost: post._id}})
+        await Post.findByIdAndUpdate(req.params.post_id, {$push: {reposters: selfUser._id}})
+
         return res.status(200).json({msg: "Post successfully reposted"})
       } else {
-        selfUser.repost.splice(selfUser.repost.indexOf(post._id), 1)
-        post.reposters.splice(post.reposters.indexOf(selfUser._id), 1)
-        selfUser.save()
-        post.save()
+
+        await User.findByIdAndUpdate(res.locals.user._id, {$pull: {repost: {$eq: post._id}}});
+        await Post.findByIdAndUpdate(req.params.post_id, {$pull: {reposters: {$eq: selfUser._id}}});
+      
         return res.status(200).json({msg: "Post successfully deleted from your reposts"})
       }
     } else {
