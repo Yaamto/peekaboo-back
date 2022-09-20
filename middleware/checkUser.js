@@ -11,7 +11,7 @@ module.exports.checkUser = async(req, res, next) => {
       if (err) {
         res.locals.user = null;
         res.cookie("jwt", "", { maxAge: 1 });
-        return res.send('token not available or expired')
+        return res.json('token not available or expired')
       } else {
 
         const user = await User.findById(decodedToken.id).select("-password");
@@ -20,7 +20,7 @@ module.exports.checkUser = async(req, res, next) => {
           next();
         } else {
           res.cookie("jwt", "", { maxAge: 1 });
-          return res.send("you are not logged")
+          return res.json("you are not logged")
 
         }
       }
