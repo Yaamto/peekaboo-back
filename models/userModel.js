@@ -17,6 +17,7 @@ const UserSchema = new Schema(
     password: {
       type: String,
       required: true,
+      //min : 8
     },
     isAdmin: {
       type: Boolean,
@@ -24,19 +25,30 @@ const UserSchema = new Schema(
     },
     profilePic: {
       type: String,
+      default: ""
     },
     bio: {
       type: String,
+      default: ""
     },
-    followers: {
-      type: [String],
-    },
-    following: {
-      type: [String],
-    },
-    likes: {
-      type: [String],
-    },
+    followers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+      },
+    ],
+    following: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+      },
+    ],
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "post",
+      },
+    ],
     repost: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -50,6 +62,7 @@ const UserSchema = new Schema(
 );
 UserSchema.pre("save", async function (next) {
   const salt = await bcrypt.genSalt();
+  console.log(salt)
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });

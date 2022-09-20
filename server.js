@@ -7,6 +7,7 @@ const cors = require('cors');
 
 const authRoutes = require("./routes/authRoutes")
 const userRoutes = require("./routes/userRoutes")
+const postRoutes = require("./routes/postRoutes")
 // const { requireAuth, checkUser, checkAdmin } = require('./middleware/auth');
 const app = express()
 
@@ -34,6 +35,7 @@ app.use(express.static("public"));
 //     });
 app.use("/auth", authRoutes)
 app.use("/user", userRoutes)
+app.use("/post", postRoutes)
 
 
 app.listen(3000, () => console.log("serveur running on port 3000"));
