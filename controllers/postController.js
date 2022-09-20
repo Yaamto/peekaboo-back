@@ -67,14 +67,12 @@ module.exports.likePost = async(req, res) => {
         console.log(currentUser.likes)
         if(post && currentUser) {
             if(!post.likes.includes(id) && !currentUser.likes.includes(post._id)){
-                await Post.findByIdAndUpdate(req.body.post_id, {$push: {likes: id}})
                 await User.findByIdAndUpdate(id, {$push: {likes: post._id}})
-                return res.status(200).json({msg: "Like added", post: post})
+                await Post.findByIdAndUpdate(req.body.post_id, {$push: {likes: id}}).then(() => res.status(200).json({msg: "Like added", post: post}))
                 
             } else {
-                await Post.findByIdAndUpdate(req.body.post_id, {$pull: {likes: {$eq: id}}})
                 await User.findByIdAndUpdate(id, {$pull: {likes: {$eq: post._id}}});
-                return res.status(200).json({msg: "Like removed", post: post})
+                await Post.findByIdAndUpdate(req.body.post_id, {$pull: {likes: {$eq: id}}}).then(() => res.status(200).json({msg: "Like removed", post: post}))
             }
         } else {
             return res.status(500).json({error: "Post not found or you're not logged in"})
