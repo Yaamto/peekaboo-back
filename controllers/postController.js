@@ -105,4 +105,13 @@ module.exports.singlePost = async(req, res) => {
 
 module.exports.feed = async(req, res) => {
 
+    const selfUser = await User.findById(res.locals.user._id).select('following -_id');
+
+    try {
+        const FeedArray = await Post.find({ $or: [ { poster: { $in: selfUser.following } }, { likes: { $in: selfUser.following } }, { reposters: { $in: selfUser.following } } ] }).sort({createdAt: -1})
+        res.json(FeedArray)
+    } catch(err) {
+        console.log(err)
+    }
+
 }
