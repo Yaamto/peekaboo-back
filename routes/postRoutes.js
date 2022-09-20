@@ -13,7 +13,7 @@ router.post('/likePost', checkUser, postController.likePost)
 
 //GET
 router.get('/singlePost/:post_id', postController.singlePost)
-router.get('/feed', postController.feed)
+router.get('/feed', checkUser, postController.feed)
 
 
 
