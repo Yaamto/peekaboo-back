@@ -64,15 +64,16 @@ module.exports.likePost = async(req, res) => {
     try {
         const post = await Post.findById(req.body.post_id)
         const currentUser = await User.findById(id)
-        console.log(currentUser.likes)
+        const date = new Date()
         if(post && currentUser) {
-            if(!post.likes.includes(id) && !currentUser.likes.includes(post._id)){
-                await User.findByIdAndUpdate(id, {$push: {likes: post._id}})
-                await Post.findByIdAndUpdate(req.body.post_id, {$push: {likes: id}}).then(() => res.status(200).json({msg: "Like added", post: post}))
+            console.log(id)
+            if(!post.likes.some(likeObject => likeObject.id.toString() == id) && !currentUser.likes.includes(post._id)){
+                const newUser = await User.findByIdAndUpdate(id, {$push: {likes: post._id}})
+                const newPost = await Post.findByIdAndUpdate(req.body.post_id, {$push: {likes: {id: id, likedAt: date}}}).then(() => res.status(200).json({msg: "Like added", post: post}))
                 
             } else {
-                await User.findByIdAndUpdate(id, {$pull: {likes: {$eq: post._id}}});
-                await Post.findByIdAndUpdate(req.body.post_id, {$pull: {likes: {$eq: id}}}).then(() => res.status(200).json({msg: "Like removed", post: post}))
+                const newUser = await User.findByIdAndUpdate(id, {$pull: {likes: {$eq: post._id}}});
+                const newPost = await Post.findByIdAndUpdate(req.body.post_id, {$pull: {likes: { id: {$eq: id} }}}).then(() => res.status(200).json({msg: "Like removed", post: post}))
             }
         } else {
             return res.status(500).json({error: "Post not found or you're not logged in"})
@@ -108,7 +109,7 @@ module.exports.feed = async(req, res) => {
     const selfUser = await User.findById(res.locals.user._id).select('following -_id');
 
     try {
-        const FeedArray = await Post.find({ $or: [ { poster: { $in: selfUser.following } }, { likes: { $in: selfUser.following } }, { reposters: { $in: selfUser.following } } ] }).sort({createdAt: -1})
+        const FeedArray = await Post.find({ $or: [ { poster: { $in: selfUser.following } }, { "likes.id":  {$in: selfUser.following} }, { "reposters.id":  {$in: selfUser.following} } ] })
         res.json(FeedArray)
     } catch(err) {
         console.log(err)

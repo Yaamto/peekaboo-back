@@ -161,18 +161,19 @@ module.exports.follow = async(req, res) => {
 module.exports.repost = async(req, res) => {
   const selfUser = await User.findById(res.locals.user._id);
   const post = await Post.findById(req.params.post_id)
+  const date = new Date()
   try {
     if(selfUser && post) {
       if(!selfUser.repost.includes(post._id)) {
 
         await User.findByIdAndUpdate(res.locals.user._id, {$push: {repost: post._id}})
-        await Post.findByIdAndUpdate(req.params.post_id, {$push: {reposters: selfUser._id}})
+        await Post.findByIdAndUpdate(req.params.post_id, {$push: {reposters: {id: selfUser._id, likedAt: date}}})
 
         return res.status(200).json({msg: "Post successfully reposted"})
       } else {
 
         await User.findByIdAndUpdate(res.locals.user._id, {$pull: {repost: {$eq: post._id}}});
-        await Post.findByIdAndUpdate(req.params.post_id, {$pull: {reposters: {$eq: selfUser._id}}});
+        await Post.findByIdAndUpdate(req.params.post_id, {$pull: {reposters: { id: {$eq: selfUser._id} }}});
       
         return res.status(200).json({msg: "Post successfully deleted from your reposts"})
       }
