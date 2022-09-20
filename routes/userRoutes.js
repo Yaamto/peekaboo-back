@@ -8,7 +8,7 @@ const { checkUser } = require('../middleware/checkUser');
 
 router.delete("/delete", checkUser ,userController.deleteUser)
 router.get("/getsingle/:id", userController.getSingleUser)
-router.put("/editbio/:id", checkUser, userController.editUserBio)
+router.put("/editbio", checkUser, userController.editUserBio)
 router.get("/users", checkUser, userController.getAllUsers)
 router.put("/addprofilepic", checkUser, userController.addProfilePic)
 router.patch("/follow/:id", checkUser, userController.follow)
