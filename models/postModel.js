@@ -12,6 +12,10 @@ const PostSchema = new Schema(
       max: 280,
       required: true,
     },
+    sortDate: {
+      type: Date,
+      default: Date.now()
+    },
     media: {
       type: String
     },
@@ -48,7 +52,7 @@ const PostSchema = new Schema(
           ref: "user",
         },
         commentedAt: {
-          type:Date,
+          type:String,
           default: Date.now()
         },
         _id : false 
