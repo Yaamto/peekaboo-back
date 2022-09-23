@@ -12,26 +12,51 @@ const PostSchema = new Schema(
       max: 280,
       required: true,
     },
+    sortDate: {
+      type: Date,
+      default: Date.now()
+    },
     media: {
       type: String
     },
     likes: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "user",
-      },
+        id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "user",
+        },
+        likedAt: {
+          type:Date,
+          default: Date.now()
+        },
+        _id : false 
+      }
     ],
     reposters: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "user",
-      },
+        id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "user",
+        },
+        repostedAt: {
+          type:Date,
+          default: Date.now()
+        },
+        _id : false 
+      }
     ],
     comments: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "comment",
-      },
+        id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "user",
+        },
+        commentedAt: {
+          type:String,
+          default: Date.now()
+        },
+        _id : false 
+      }
     ],
     edited: {
       type: Boolean,
