@@ -10,7 +10,7 @@ module.exports.addComment = async(req, res) => {
         if(content){
             const data = await Comment.create({
                 post_id: post,
-                user_id: user_id,
+                user: user_id,
                 content: content,
             })
             try {
@@ -47,12 +47,11 @@ module.exports.deleteComment = async(req, res) => {
     const comment= req.params.comment
     try {
         const searchComment = await Comment.findById(comment);
-        if(res.locals.user._id.toString() === searchComment.user_id.toString()) {
+        if(res.locals.user._id.toString() === searchComment.user.toString()) {
           const data = await Comment.findByIdAndDelete({ _id: comment });
 
           if (data) {
             try {
-                console.log(data.post_id)
                const deleteCommentToPost = await Post.findByIdAndUpdate(
                     {_id: data.post_id},
                     {$pull: {comments: {$eq: comment}}}
@@ -76,6 +75,3 @@ module.exports.deleteComment = async(req, res) => {
         res.status(404).send({ err: err });
       }
     };
-
-            
-                

@@ -7,7 +7,7 @@ const CommentSchema = new Schema(
         type:mongoose.Schema.Types.ObjectId,
         ref: 'post'
     },
-    user_id : {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     },
@@ -18,7 +18,7 @@ const CommentSchema = new Schema(
     },
     likes: [
         {
-            user_id: {
+            user: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'user'
             }

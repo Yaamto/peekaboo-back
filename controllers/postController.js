@@ -93,10 +93,10 @@ module.exports.likePost = async(req, res) => {
 
 module.exports.singlePost = async(req, res) => {
     try {
-        const post = ObjectId.isValid(req.params.post_id) ? await Post.findById(req.body.post_id)
+        const post = ObjectId.isValid(req.params.post_id) ? await Post.findById(req.params.post_id)
         .populate({ path: 'poster', select: '_id username isAdmin' })
         .populate({ path: 'likes', select: '-password' }) 
-        // .populate({ path: 'comments', select: '_id username isAdmin' })
+        .populate({ path: 'comments', populate : {path : "user", select : "-password"} })
         : null
         
         if (post) {
