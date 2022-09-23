@@ -112,6 +112,7 @@ module.exports.singlePost = async(req, res) => {
 module.exports.feed = async(req, res) => {
 
     const selfUser = await User.findById(res.locals.user._id).select('following -_id');
+    const page = (req.params.page - 1);
 
     try {
 
@@ -132,8 +133,10 @@ module.exports.feed = async(req, res) => {
         const posterArray = await Post.find({poster: { $in: selfUser.following }})
 
         let concatArray = _.concat(posterArray, likesArray, repostersArray)
+
+        let finalArray =  _.chunk(feedOrderer(concatArray), 3)
         
-        res.json(feedOrderer(concatArray))
+        res.json(finalArray[page])
     } catch(err) {
         console.log(err)
     }
