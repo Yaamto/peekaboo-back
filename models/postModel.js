@@ -6,6 +6,7 @@ const PostSchema = new Schema(
     poster: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
+      autopopulate: {select: "_id username isAdmin"}
     },
     content: {
       type: String,
@@ -24,6 +25,7 @@ const PostSchema = new Schema(
         id: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "user",
+          autopopulate: {select: "_id username profilePic isAdmin"}
         },
         likedAt: {
           type:Date,
@@ -36,7 +38,8 @@ const PostSchema = new Schema(
       {
         id: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "user",
+          ref: "user", 
+          autopopulate: {select: "_id username profilePic isAdmin"}
         },
         repostedAt: {
           type:Date,
@@ -48,7 +51,8 @@ const PostSchema = new Schema(
     comments: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "comment" 
+        ref: "comment",
+        autopopulate: true
       }
     ],
     edited: {
@@ -60,5 +64,5 @@ const PostSchema = new Schema(
     timestamps: true,
   }
 );
-
+PostSchema.plugin(require('mongoose-autopopulate'));
 module.exports = { Post: mongoose.model("post", PostSchema) };

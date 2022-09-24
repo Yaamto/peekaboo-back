@@ -20,7 +20,8 @@ const CommentSchema = new Schema(
         {
             user: {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: 'user'
+                ref: 'user',
+                autopopulate: {select: "_id username profilePic isAdmin"}
             }
         }
     ]
@@ -29,5 +30,5 @@ const CommentSchema = new Schema(
     timestamps: true,
   }
 );
-
+CommentSchema.plugin(require('mongoose-autopopulate'));
 module.exports = { Comment: mongoose.model("comment", CommentSchema) };

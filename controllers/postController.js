@@ -27,7 +27,6 @@ module.exports.addPost = async(req, res) => {
         console.log(err)
     }
 }
-
 //POST
 module.exports.deletePost = async(req, res) => {
     const {_id, isAdmin} = res.locals.user
@@ -43,7 +42,6 @@ module.exports.deletePost = async(req, res) => {
         console.log(err)
     }
 }
-
 //POST
 module.exports.editPost = async(req, res) => {
     const id = res.locals.user._id
@@ -62,7 +60,6 @@ module.exports.editPost = async(req, res) => {
         console.log(err)
     }
 }
-
 //POST
 module.exports.likePost = async(req, res) => {
     const id = res.locals.user._id
@@ -75,7 +72,6 @@ module.exports.likePost = async(req, res) => {
             if(!post.likes.some(likeObject => likeObject.id.toString() == id) && !currentUser.likes.includes(post._id)){
                 const newUser = await User.findByIdAndUpdate(id, {$push: {likes: post._id}})
                 const newPost = await Post.findByIdAndUpdate(req.body.post_id, {$push: {likes: {id: id, likedAt: date}}}).then(() => res.status(200).json({msg: "Like added", post: post}))
-                
             } else {
                 const newUser = await User.findByIdAndUpdate(id, {$pull: {likes: {$eq: post._id}}});
                 const newPost = await Post.findByIdAndUpdate(req.body.post_id, {$pull: {likes: { id: {$eq: id} }}}).then(() => res.status(200).json({msg: "Like removed", post: post}))
@@ -83,7 +79,6 @@ module.exports.likePost = async(req, res) => {
         } else {
             return res.status(500).json({error: "Post not found or you're not logged in"})
         }
-
     } catch(err) {
         console.log(err)
     }
@@ -93,11 +88,7 @@ module.exports.likePost = async(req, res) => {
 
 module.exports.singlePost = async(req, res) => {
     try {
-        const post = ObjectId.isValid(req.params.post_id) ? await Post.findById(req.params.post_id)
-        .populate({ path: 'poster', select: '_id username isAdmin' })
-        .populate({ path: 'likes', select: '-password' }) 
-        .populate({ path: 'comments', populate : {path : "user", select : "-password"} })
-        : null
+        const post = ObjectId.isValid(req.params.post_id) ? await Post.findById(req.params.post_id): null
         
         if (post) {
             return res.status(200).json({data: post})

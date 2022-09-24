@@ -130,27 +130,19 @@ module.exports.follow = async(req, res) => {
     if (selfUser && followedUser) {
       if (!selfUser.following.includes(followedUser._id) && !followedUser.followers.includes(selfUser._id)) {
         if(selfUser._id.toString() != req.params.id.toString()) {
-
           await User.findByIdAndUpdate(res.locals.user._id, {$push: {following: followedUser._id}})
           await User.findByIdAndUpdate(req.params.id, {$push: {followers: selfUser._id}})
-          return res.status(200).json({ msg: "You are now following this user" });
-          
+          return res.status(200).json({ msg: "You are now following this user" });  
         } else {
-
           return res.status(200).json({ error: "You cannot follow yourself" });
-
         }
       } else {
         await User.findByIdAndUpdate(res.locals.user._id, {$pull: {following: {$eq: followedUser._id}}});
         await User.findByIdAndUpdate(req.params.id, {$pull: {followers: {$eq: selfUser._id}}})
-        
         return res.status(200).json({ msg: "You are now un-following this user" });
-        
       }
     } else {
-      
       return res.status(200).json({ error: "User does not exist." });
-      
     }
   } catch (err) {
     return res.json(err)
@@ -165,16 +157,12 @@ module.exports.repost = async(req, res) => {
   try {
     if(selfUser && post) {
       if(!selfUser.repost.includes(post._id)) {
-
         await User.findByIdAndUpdate(res.locals.user._id, {$push: {repost: post._id}})
         await Post.findByIdAndUpdate(req.params.post_id, {$push: {reposters: {id: selfUser._id, likedAt: date}}})
-
         return res.status(200).json({msg: "Post successfully reposted"})
       } else {
-
         await User.findByIdAndUpdate(res.locals.user._id, {$pull: {repost: {$eq: post._id}}});
         await Post.findByIdAndUpdate(req.params.post_id, {$pull: {reposters: { id: {$eq: selfUser._id} }}});
-      
         return res.status(200).json({msg: "Post successfully deleted from your reposts"})
       }
     } else {
