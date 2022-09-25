@@ -75,3 +75,37 @@ module.exports.deleteComment = async(req, res) => {
         res.status(404).send({ err: err });
       }
     };
+
+module.exports.likeComment = async(req, res) => {
+  const comment = req.params.comment
+  const user = res.locals.user._id
+
+  try{
+    const isLiked = await Comment.findOne({ "likes.user":  {$in: user} })
+
+    if(!isLiked){
+      const data = await Comment.findByIdAndUpdate(
+        {_id: comment},
+        {$push : {likes: {user: user }}}
+        )
+        if(data){
+          res.status(200).send({ liked: "Comment liked" });
+        }else {
+          res.status(400)
+        }
+      }else {
+        const data = await Comment.findByIdAndUpdate(
+          {_id: comment},
+          {$pull : {likes: {user: user }}}
+          )
+          if(data){
+            res.status(200).send({ liked: "Comment unliked" });
+          }else {
+            res.status(400)
+          }
+      }
+  }
+  catch(err){
+    res.status(404).send({ err: err });
+  }
+}
