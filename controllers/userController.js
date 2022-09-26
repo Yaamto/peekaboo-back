@@ -2,6 +2,8 @@ const User = require("../models/userModel").User;
 const Post = require("../models/postModel").Post;
 const ObjectId = require('mongoose').Types.ObjectId;
 const { isEmpty } = require("../config/customFunction");
+const fs = require("fs")
+
 
 
 module.exports.getSingleUser = async(req, res) => {
@@ -88,26 +90,47 @@ module.exports.getAllUsers = async (req, res) => {
 
 module.exports.addProfilePic = async (req, res) => {
   const id = res.locals.user._id;
-  let filename = "";
+  let file = req.files.file;
+  let filename = file.name;
+  let extensionName = filename.split('.').pop()
+  const allowedExtension = ['png','jpg','jpeg'];
 
-  if (req.files) {
-    let file = req.files.file;
-    filename = file.name;
+  if(!allowedExtension.includes(extensionName)){
+    return res.status(422).send("Invalid Image");
+}
+
+  if (req.files.file) {
     let uploadDir = "./files/";
+    const user = await User.findById(id)
+    if(user.profilePic !== ""){
+      let picExtension = user.profilePic.split('.').pop()
+      console.log(uploadDir + id+ "." + picExtension)
+      fs.unlink(uploadDir + id+"."+picExtension, (err) => {
+        if (err) {
+            throw err;
+        }
+    
+        console.log("Delete File successfully.");
+    });
+    }
 
-    file.mv(uploadDir + filename, (err) => {
+    
+
+    file.mv(uploadDir + id+"."+extensionName, (err) => {
       if (err) console.log("big erreur lol");
     });
+  
   } else {
     console.log("le fichier n'est pas pris en compte");
   }
 
   try {
+
       const data = await User.findByIdAndUpdate(
         { _id: id },
         {
           $set: {
-            profilePic: `/files/${filename}`,
+            profilePic: `/files/${id}.${extensionName}`,
           },
         },
         { new: true, upsert: true, setDefaultsOnInsert: true }
