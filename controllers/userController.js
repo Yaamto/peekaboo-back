@@ -127,7 +127,7 @@ module.exports.addProfilePic = async (req, res) => {
         { _id: id },
         {
           $set: {
-            profilePic: `/media/${id}/profilepic/${id}.${extensionName}`,
+            profilePic: `/media/${id}/profilepic/${id}.webp`,
           },
         },
         { new: true, upsert: true, setDefaultsOnInsert: true }
