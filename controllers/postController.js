@@ -45,9 +45,9 @@ module.exports.deletePost = async(req, res) => {
 //POST
 module.exports.editPost = async(req, res) => {
     const id = res.locals.user._id
-    const { post_id, content, media } = req.body
+    const { content, media } = req.body
     try {
-        const post = await Post.findById(post_id)
+        const post = await Post.findById(req.params.id)
         if (post && post.poster.toString() === id.toString()) {
             post.content = content ? content : post.content
             post.edited = true
@@ -64,11 +64,10 @@ module.exports.editPost = async(req, res) => {
 module.exports.likePost = async(req, res) => {
     const id = res.locals.user._id
     try {
-        const post = await Post.findById(req.body.post_id)
+        const post = await Post.findById(req.params.id)
         const currentUser = await User.findById(id)
         const date = new Date()
         if(post && currentUser) {
-            console.log(id)
             if(!post.likes.some(likeObject => likeObject.id.toString() == id) && !currentUser.likes.includes(post._id)){
                 const newUser = await User.findByIdAndUpdate(id, {$push: {likes: post._id}})
                 const newPost = await Post.findByIdAndUpdate(req.body.post_id, {$push: {likes: {id: id, likedAt: date}}}).then(() => res.status(200).json({msg: "Like added", post: post}))
