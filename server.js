@@ -4,7 +4,6 @@ require('./config/config')
 const fileUpload = require('express-fileupload');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-
 const authRoutes = require("./routes/authRoutes")
 const userRoutes = require("./routes/userRoutes")
 const postRoutes = require("./routes/postRoutes")
