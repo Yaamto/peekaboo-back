@@ -93,7 +93,6 @@ module.exports.getAllUsers = async (req, res) => {
 
 module.exports.addProfilePic = async (req, res) => {
   const id = res.locals.user._id;
-  const user = await User.findById(id)
   let file = req.files.file;
   let filename = file.name;
   let uploadDir = "./media/"+id+"/profilepic/";
