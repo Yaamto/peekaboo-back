@@ -17,9 +17,9 @@ const PostSchema = new Schema(
       type: Date,
       default: Date.now()
     },
-    media: {
+    media: [{
       type: String
-    },
+    }],
     likes: [
       {
         user: {

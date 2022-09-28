@@ -5,7 +5,7 @@ const postController = require('../controllers/postController')
 
 //POST
 router.post('/addPost', checkUser, postController.addPost)
-router.post('/deletePost', checkUser, postController.deletePost)
+router.post('/deletePost/:id', checkUser, postController.deletePost)
 router.put('/editPost/:id', checkUser, postController.editPost)
 router.post('/likePost/:id', checkUser, postController.likePost)
 

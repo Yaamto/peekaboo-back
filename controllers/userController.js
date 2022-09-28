@@ -102,7 +102,7 @@ module.exports.addProfilePic = async (req, res) => {
   const OUTPUT_path = rootDir.replace(/\\/g, '/')+"/media/"+id+"/profilepic/";
   if(!allowedExtension.includes(extensionName)){
     return res.status(422).send("Invalid file format");
-}
+  }
   if (req.files.file) {
     if(!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, {recursive: true});
