@@ -68,12 +68,12 @@ module.exports.likePost = async(req, res) => {
         const currentUser = await User.findById(id)
         const date = new Date()
         if(post && currentUser) {
-            if(!post.likes.some(likeObject => likeObject.id.toString() == id) && !currentUser.likes.includes(post._id)){
+            if(!post.likes.some(likeObject => likeObject.id == id) && !currentUser.likes.includes(post._id)){
                 const newUser = await User.findByIdAndUpdate(id, {$push: {likes: post._id}})
-                const newPost = await Post.findByIdAndUpdate(req.body.post_id, {$push: {likes: {user: id, likedAt: date}}}).then(() => res.status(200).json({msg: "Like added", post: post}))
+                const newPost = await Post.findByIdAndUpdate(req.params.id, {$push: {likes: {user: id, likedAt: date}}}).then(() => res.status(200).json({msg: "Like added", post: post}))
             } else {
                 const newUser = await User.findByIdAndUpdate(id, {$pull: {likes: {$eq: post._id}}});
-                const newPost = await Post.findByIdAndUpdate(req.body.post_id, {$pull: {likes: { user: {$eq: id} }}}).then(() => res.status(200).json({msg: "Like removed", post: post}))
+                const newPost = await Post.findByIdAndUpdate(req.params.id, {$pull: {likes: { user: {$eq: id} }}}).then(() => res.status(200).json({msg: "Like removed", post: post}))
             }
         } else {
             return res.status(500).json({error: "Post not found or you're not logged in"})
