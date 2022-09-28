@@ -70,10 +70,10 @@ module.exports.likePost = async(req, res) => {
         if(post && currentUser) {
             if(!post.likes.some(likeObject => likeObject.id.toString() == id) && !currentUser.likes.includes(post._id)){
                 const newUser = await User.findByIdAndUpdate(id, {$push: {likes: post._id}})
-                const newPost = await Post.findByIdAndUpdate(req.body.post_id, {$push: {likes: {id: id, likedAt: date}}}).then(() => res.status(200).json({msg: "Like added", post: post}))
+                const newPost = await Post.findByIdAndUpdate(req.body.post_id, {$push: {likes: {user: id, likedAt: date}}}).then(() => res.status(200).json({msg: "Like added", post: post}))
             } else {
                 const newUser = await User.findByIdAndUpdate(id, {$pull: {likes: {$eq: post._id}}});
-                const newPost = await Post.findByIdAndUpdate(req.body.post_id, {$pull: {likes: { id: {$eq: id} }}}).then(() => res.status(200).json({msg: "Like removed", post: post}))
+                const newPost = await Post.findByIdAndUpdate(req.body.post_id, {$pull: {likes: { user: {$eq: id} }}}).then(() => res.status(200).json({msg: "Like removed", post: post}))
             }
         } else {
             return res.status(500).json({error: "Post not found or you're not logged in"})
@@ -106,17 +106,18 @@ module.exports.feed = async(req, res) => {
 
     try {
 
-        const likesArray = await Post.find({ "likes.id":  {$in: selfUser.following} })
+        const likesArray = await Post.find({ "likes.user":  {$in: selfUser.following} })
         likesArray.map(post => {
             let indexLike;
-            post.likes.map((object, key) =>  selfUser.following.includes(object.id) ? indexLike = key : null)
+            post.likes.map((object, key) =>  selfUser.following.includes(object.user._id) ? indexLike = key : null)
             post.sortDate = post.likes[indexLike].likedAt
+
         })
 
-        const repostersArray = await Post.find({ "reposters.id":  {$in: selfUser.following} })
+        const repostersArray = await Post.find({ "reposters.user":  {$in: selfUser.following} })
         repostersArray.map(post => {
             let indexRepost;
-            post.reposters.map((object, key) =>  selfUser.following.includes(object.id) ? indexRepost = key : null)
+            post.reposters.map((object, key) =>  selfUser.following.includes(object.user._id) ? indexRepost = key : null)
             post.sortDate = post.reposters[indexRepost].repostedAt  
         })
 
@@ -124,7 +125,7 @@ module.exports.feed = async(req, res) => {
 
         let concatArray = _.concat(posterArray, likesArray, repostersArray)
 
-        let finalArray =  _.chunk(feedOrderer(concatArray), 3)
+        let finalArray =  _.chunk(feedOrderer(concatArray), 30)
         
         res.json(finalArray[page])
     } catch(err) {
