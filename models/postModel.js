@@ -22,7 +22,7 @@ const PostSchema = new Schema(
     },
     likes: [
       {
-        id: {
+        user: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "user",
           autopopulate: {select: "_id username profilePic isAdmin"}
@@ -36,7 +36,7 @@ const PostSchema = new Schema(
     ],
     reposters: [
       {
-        id: {
+        user: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "user", 
           autopopulate: {select: "_id username profilePic isAdmin"}
