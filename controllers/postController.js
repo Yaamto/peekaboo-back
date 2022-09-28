@@ -14,7 +14,6 @@ module.exports.addPost = async(req, res) => {
     const {content} = req.body
     const allowedExtension = ['png','jpg','jpeg'];
     let allowedContent = true;
-    
 
     try {
         (req.files.media.length >= 1 ? req.files.media: [req.files.media]).map(media => {
@@ -28,7 +27,7 @@ module.exports.addPost = async(req, res) => {
         if(allowedContent == false) {
             return res.status(422).send("Invalid file format");
         }
-        
+
         if (content) {
             const theDate = new Date()
             const newPost = await Post.create({
@@ -47,6 +46,8 @@ module.exports.addPost = async(req, res) => {
         console.log(err)
     }
 }
+
+
 //POST
 module.exports.deletePost = async(req, res) => {
     const {_id, isAdmin} = res.locals.user
