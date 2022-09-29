@@ -5,19 +5,25 @@ const MessageSchema = new Schema(
   {
     chat_id: {
         type:mongoose.Schema.Types.ObjectId,
-        ref: 'chat'
+        ref: 'chat',
+        required: true
     },
-    user_id: {
+    sender_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'user'
+        ref: 'user',
+        required: true
     },
-    message: {
+    content: {
         type: String,
         max:280
     },
     media: [{
       type: String
     }],
+    isRead: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true,

@@ -24,9 +24,8 @@ const feedOrderer = (concatArray) => {
     return finalArray
 }
 
-const mediaHandler = (media, post_id, user_id, res) => {
+const mediaHandler = (media, post_id, user_id) => {
     let pathArray = [];
-    const allowedExtension = ['png','jpg','jpeg'];
     let uploadDir = "./media/"+user_id+"/"+post_id+"/";
 
 
