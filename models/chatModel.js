@@ -8,25 +8,25 @@ const ChatSchema = new Schema(
     //      trim: true
     //      },
     isGroupChat: {
-         type: Boolean,
-         default: false 
-        },
+      type: Boolean,
+      default: false,
+    },
     users: [
-        { 
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "user",
-            autopopulate: {select: "-password"}
-         }
-        ],
-//     latestMessage: {
-//       type: mongoose.Schema.Types.ObjectId,
-//       ref: "message",
-//       autopopulate: true
-//   },
-},
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+        autopopulate: { select: "-password" },
+      },
+    ],
+        latestMessage: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "message",
+          autopopulate: true
+      },
+  },
   {
     timestamps: true,
   }
 );
-ChatSchema.plugin(require('mongoose-autopopulate'));
+ChatSchema.plugin(require("mongoose-autopopulate"));
 module.exports = { Chat: mongoose.model("chat", ChatSchema) };
