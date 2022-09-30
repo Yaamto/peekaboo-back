@@ -16,13 +16,15 @@ module.exports.addPost = async(req, res) => {
     let allowedContent = true;
 
     try {
-        (req.files.media.length >= 1 ? req.files.media: [req.files.media]).map(media => {
-            let extName = media.name.split('.').pop()
-            
-            if(!allowedExtension.includes(extName)){
-                allowedContent = false
-            }
-        })
+        if(req.files) {
+            (req.files.media.length >= 1 ? req.files.media: [req.files.media]).map(media => {
+                let extName = media.name.split('.').pop()
+                
+                if(!allowedExtension.includes(extName)){
+                    allowedContent = false
+                }
+            })
+        }
 
         if(allowedContent == false) {
             return res.status(422).send("Invalid file format");
@@ -36,7 +38,7 @@ module.exports.addPost = async(req, res) => {
                 sortDate: theDate
             })
             if(req.files != null) {
-                await Post.updateOne({_id: newPost._id}, {media : mediaHandler(req.files.media, newPost._id, id) })
+                await Post.updateOne({_id: newPost._id}, {media : mediaHandler(req.files.media, newPost._id, id, 'post') })
             }
             return res.status(200).json({msg: newPost})
         } else {

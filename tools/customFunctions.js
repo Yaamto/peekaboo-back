@@ -24,15 +24,15 @@ const feedOrderer = (concatArray) => {
     return finalArray
 }
 
-const mediaHandler = (media, post_id, user_id) => {
+const mediaHandler = (media, objectId, user_id, type) => {
     let pathArray = [];
-    let uploadDir = "./media/"+user_id+"/"+post_id+"/";
+    let uploadDir = type == 'post' ? "./media/"+user_id+"/"+objectId+"/" : "./media/"+user_id+"/chat/";
 
 
     (media.length >= 1 ? media: [media]).map((media, key) => {
         let extensionName = media.name.split('.').pop()
-        let filename = post_id+'-'+key+"."+extensionName
-        let filenamewebp = post_id+'-'+key+".webp"
+        let filename = objectId+'-'+key+"."+extensionName
+        let filenamewebp = objectId+'-'+key+".webp"
         if(!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, {recursive: true});
           }
@@ -50,7 +50,8 @@ const mediaHandler = (media, post_id, user_id) => {
             
         })
 
-        pathArray.push("/media/"+user_id+"/"+post_id+"/"+filenamewebp)
+        type == 'post' ? pathArray.push("/media/"+user_id+"/"+objectId+"/"+filenamewebp) : pathArray.push("/media/"+user_id+"/chat/"+filenamewebp)
+        
 
     })
 
