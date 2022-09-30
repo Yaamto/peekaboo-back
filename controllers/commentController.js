@@ -2,20 +2,21 @@ const { Comment } = require("../models/commentModel")
 const { Post } = require("../models/postModel")
 
 module.exports.addComment = async(req, res) => {
-    const post = req.params.post
+    const post = Post.findById(req.params.post)
     const user_id = res.locals.user._id
     const content = req.body.content
 
     try {
-        if(content){
+        if(post) {
+          if(content){
             const data = await Comment.create({
-                post_id: post,
+                post_id: req.params.post,
                 user: user_id,
                 content: content,
             })
             try {
                  await Post.findByIdAndUpdate(
-                  { _id: post },
+                  { _id: req.params.post },
                   {
                     $push: {
                       comments: data,
@@ -33,8 +34,9 @@ module.exports.addComment = async(req, res) => {
               console.log(erreur);
             }
             
-        }else {
-            return res.status(404).json({erreur : "The comment's content is empty"})
+          }else {
+              return res.status(404).json({erreur : "The comment's content is empty"})
+          }
         }
     }
     catch(err){

@@ -1,6 +1,8 @@
 const Post = require("../models/postModel").Post;
+const fs = require("fs");
 const User = require("../models/userModel").User;
-const feedOrderer = require("../tools/customFunctions").feedOrderer;
+const Comment = require("../models/commentModel").Comment;
+const {feedOrderer, mediaHandler} = require("../tools/customFunctions");
 const { concat } = require("lodash");
 var _ = require('lodash');
 const { isEmpty } = require("../config/customFunction");
@@ -9,16 +11,35 @@ const ObjectId = require('mongoose').Types.ObjectId;
 //POST
 module.exports.addPost = async(req, res) => {
     const id = res.locals.user._id
-    const { content, media } = req.body
+    const {content} = req.body
+    const allowedExtension = ['png','jpg','jpeg'];
+    let allowedContent = true;
+
     try {
+        if(req.files) {
+            (req.files.media.length >= 1 ? req.files.media: [req.files.media]).map(media => {
+                let extName = media.name.split('.').pop()
+                
+                if(!allowedExtension.includes(extName)){
+                    allowedContent = false
+                }
+            })
+        }
+
+        if(allowedContent == false) {
+            return res.status(422).send("Invalid file format");
+        }
+
         if (content) {
             const theDate = new Date()
             const newPost = await Post.create({
                 poster: id,
                 content: content,
-                media: media ? media : "",
                 sortDate: theDate
             })
+            if(req.files != null) {
+                await Post.updateOne({_id: newPost._id}, {media : mediaHandler(req.files.media, newPost._id, id, 'post') })
+            }
             return res.status(200).json({msg: newPost})
         } else {
             return res.status(500).json({error: "No content provided"})
@@ -27,16 +48,26 @@ module.exports.addPost = async(req, res) => {
         console.log(err)
     }
 }
+
+
 //POST
 module.exports.deletePost = async(req, res) => {
     const {_id, isAdmin} = res.locals.user
+    const post = await Post.findById(req.params.id)
     try {
-        const post = await Post.findById(req.body.post_id)
-        if(post && post.poster.toString() === _id.toString() || isAdmin === true) {
-            await post.delete()
-            return res.status(200).json({msg: "Delete successful"})    
+        if(post) {
+            if(post.poster._id.valueOf() === _id.valueOf() || isAdmin === true) {
+                fs.rmSync(`./media/${_id}/${post._id}/`, { recursive: true, force: true });
+                await User.updateMany({likes: {$in : post._id}}, {$pull: {likes: {$eq: post._id} }})
+                await User.updateMany({repost: {$in : post._id}}, {$pull: {repost: {$eq: post._id} }})
+                await Comment.deleteMany({post_id: post._id})
+                await Post.findByIdAndRemove(post._id)
+                return res.status(200).json({msg: "Delete successful"})    
+            } else {
+                return res.status(500).json({error: "This post isn't yours"})
+            }
         } else {
-            return res.status(500).json({error: "Invalid post Id, post already deleted, or this post isn't yours"})
+            return res.status(500).json({error: "Invalid post Id, post already deleted"})
         }
     } catch(err) {
         console.log(err)

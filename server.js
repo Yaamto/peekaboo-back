@@ -4,11 +4,11 @@ require('./config/config')
 const fileUpload = require('express-fileupload');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-
 const authRoutes = require("./routes/authRoutes")
 const userRoutes = require("./routes/userRoutes")
 const postRoutes = require("./routes/postRoutes")
 const commentRoutes = require("./routes/commentRoutes")
+const chatRoutes = require("./routes/chatRoutes")
 // const { requireAuth, checkUser, checkAdmin } = require('./middleware/auth');
 const app = express()
 
@@ -38,6 +38,7 @@ app.use("/auth", authRoutes)
 app.use("/user", userRoutes)
 app.use("/post", postRoutes)
 app.use("/comment", commentRoutes)
+app.use("/chat", chatRoutes)
 
 
 app.listen(3000, () => console.log("serveur running on port 3000"));

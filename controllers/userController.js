@@ -1,7 +1,12 @@
 const User = require("../models/userModel").User;
 const Post = require("../models/postModel").Post;
+const compress_images = require("compress-images")
 const ObjectId = require('mongoose').Types.ObjectId;
 const { isEmpty } = require("../config/customFunction");
+const fs = require("fs")
+const os = require("os");
+const rootDir = require('path').resolve('./');
+
 
 
 module.exports.getSingleUser = async(req, res) => {
@@ -88,26 +93,40 @@ module.exports.getAllUsers = async (req, res) => {
 
 module.exports.addProfilePic = async (req, res) => {
   const id = res.locals.user._id;
-  let filename = "";
-
-  if (req.files) {
-    let file = req.files.file;
-    filename = file.name;
-    let uploadDir = "./files/";
-
-    file.mv(uploadDir + filename, (err) => {
+  let file = req.files.file;
+  let filename = file.name;
+  let uploadDir = "./media/"+id+"/profilepic/";
+  let extensionName = filename.split('.').pop()
+  const allowedExtension = ['png','jpg','jpeg'];
+  const INPUT_path_to_your_images = rootDir.replace(/\\/g, '/')+"/media/"+id+"/profilepic/"+id+"."+extensionName;
+  const OUTPUT_path = rootDir.replace(/\\/g, '/')+"/media/"+id+"/profilepic/";
+  if(!allowedExtension.includes(extensionName)){
+    return res.status(422).send("Invalid file format");
+  }
+  if (req.files.file) {
+    if(!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, {recursive: true});
+    }
+    file.mv(uploadDir + id+"."+extensionName, (err) => {
       if (err) console.log("big erreur lol");
+      compress_images(INPUT_path_to_your_images, OUTPUT_path, {compress_force: true, statistic: true, autoupdate: true}, false, 
+        { jpg: { engine: "webp", command: false } },
+        { png: { engine: "webp", command: false } },
+        { svg: { engine: "svgo", command: false } },
+        { gif: { engine: "gifsicle", command: false } },
+        function () {
+          fs.unlinkSync(INPUT_path_to_your_images);
+        })
     });
   } else {
     console.log("le fichier n'est pas pris en compte");
   }
-
   try {
       const data = await User.findByIdAndUpdate(
         { _id: id },
         {
           $set: {
-            profilePic: `/files/${filename}`,
+            profilePic: `/media/${id}/profilepic/${id}.webp`,
           },
         },
         { new: true, upsert: true, setDefaultsOnInsert: true }
@@ -117,7 +136,6 @@ module.exports.addProfilePic = async (req, res) => {
       } else {
         res.json(err);
       }
-
   } catch (erreur) {
     console.log(erreur);
   }
