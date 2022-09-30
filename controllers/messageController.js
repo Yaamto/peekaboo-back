@@ -24,22 +24,40 @@ module.exports.addMessage = async(req,res) => {
                         }
                         await Chat.findOneAndUpdate({_id: chat._id}, {latestMessage: message._id}).then(() => {
                             res.status(200).json({msg: 'Message sent, and last message updated', message: message})
-                        })
-                        
+                        }) 
                     })
                 } else {
                     res.status(404).json({error: 'Provide at least a message or a media'})
-                }
-                
+                }      
             } else {
                 res.status(401).json({error: 'This isn\'t your chat. Go find friends'})
             }
         }catch(err) {
             res.status(404).json(err)
         }
-
     } else {
         res.status(406).json({error: "No chat found. Chat hasn't been created"})
     }
 
+}
+
+module.exports.getAllMessages = async(req, res) =>{
+   const user_id = res.locals.user._id
+   const chat =  ObjectId.isValid(req.params.chat) ? await Chat.findById(req.params.chat): null
+   
+   if(chat){
+    try {
+        if(chat.users.some((user) => user._id.valueOf() === user_id.valueOf())) {
+            const data = await Message.find({chat_id: chat._id})
+            res.status(200).json({msg: data})
+        } else {
+            res.status(403).json({error : "You are not authorized to get msg"})
+        }
+   }
+   catch(err){
+    res.status(404).json(err)
+   }
+} else {
+    res.status(404).json({error: "This chat doesn't exist"})
+}
 }

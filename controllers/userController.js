@@ -4,7 +4,6 @@ const compress_images = require("compress-images")
 const ObjectId = require('mongoose').Types.ObjectId;
 const { isEmpty } = require("../config/customFunction");
 const fs = require("fs")
-const os = require("os");
 const rootDir = require('path').resolve('./');
 
 
@@ -14,11 +13,9 @@ module.exports.getSingleUser = async(req, res) => {
     const user = await User.findById(req.params.id).select('-password -email')
     .populate({ path: 'followers', select: '_id username bio profilePic' })
     .populate({ path: 'following', select: '_id username bio profilePic' })
-
     .populate({ path : 'likes', populate : { path : 'reposters', select: '_id username bio profilePic'}})
     .populate({ path : 'likes', populate : { path : 'likes', select: '_id username bio profilePic'}})
     // .populate({ path : 'likes', populate : { path : 'comments', select: '_id username' }})
-
     .populate({ path : 'repost', populate : { path : 'reposters', select: '_id username bio profilePic'}})
     .populate({ path : 'repost', populate : { path : 'likes', select: '_id username bio profilePic'}})
     // .populate({ path : 'repost', populate : { path : 'comments', select: '_id username' }})
@@ -52,7 +49,6 @@ module.exports.editUserBio = async (req, res) => {
   const bio = req.body.bio;
   const id = res.locals.user._id;
   try {
-
       const data = await User.findByIdAndUpdate(
         { _id: id },
         {
@@ -72,7 +68,6 @@ module.exports.editUserBio = async (req, res) => {
     res.status(404).send({ err: err });
   }
 };
-
 
 module.exports.getAllUsers = async (req, res) => {
   try {

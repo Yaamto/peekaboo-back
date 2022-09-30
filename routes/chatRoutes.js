@@ -10,6 +10,7 @@ router.get("/getallchats", checkUser, chatController.getAllChats)
 
 // Messages
 router.post("/addmessage", checkUser, messageController.addMessage)
+router.get("/getallmessages/:chat", checkUser, messageController.getAllMessages)
 
 
 module.exports = router
