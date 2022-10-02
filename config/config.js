@@ -3,7 +3,7 @@ require('dotenv').config()
 
 mongoose
   .connect(
-    "mongodb+srv://" + process.env.DB_PASS +"@cluster0.kblyp.mongodb.net/peakaboo",
+    "mongodb+srv://" + process.env.DB_PASS +"@cluster0.ivelk.mongodb.net/peakaboo",
     {
       useNewUrlParser: true,
    
