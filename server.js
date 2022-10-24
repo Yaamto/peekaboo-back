@@ -8,8 +8,9 @@ const authRoutes = require("./routes/authRoutes")
 const userRoutes = require("./routes/userRoutes")
 const postRoutes = require("./routes/postRoutes")
 const commentRoutes = require("./routes/commentRoutes")
+const mediaRoutes = require("./routes/mediaRoutes")
 const chatRoutes = require("./routes/chatRoutes")
-// const { requireAuth, checkUser, checkAdmin } = require('./middleware/auth');
+const { checkUser } = require('./middleware/checkUser');
 const app = express()
 
 app.use(fileUpload());
@@ -27,9 +28,9 @@ app.use(cookieParser())
 app.use(express.static("public"));
 
 
-// app.get("/jwtid", checkUser, (req, res) => {
-//    return res.status(200).json({user : res.locals.user})
-//    });
+app.get("/jwtid", checkUser, (req, res) => {
+   return res.status(200).json({user : res.locals.user})
+   });
 
 //    app.get("/jwtid/admin", checkAdmin, (req, res) => {
 //     return res.status(200).json({user : res.locals.user})
@@ -39,6 +40,7 @@ app.use("/user", userRoutes)
 app.use("/post", postRoutes)
 app.use("/comment", commentRoutes)
 app.use("/chat", chatRoutes)
+app.use(mediaRoutes)
 
 
-app.listen(3000, () => console.log("serveur running on port 3000"));
+app.listen(3001, () => console.log("serveur running on port 3001"));

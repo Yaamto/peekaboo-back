@@ -40,7 +40,9 @@ module.exports.addPost = async(req, res) => {
             if(req.files != null) {
                 await Post.updateOne({_id: newPost._id}, {media : mediaHandler(req.files.media, newPost._id, id, 'post') })
             }
-            return res.status(200).json({msg: newPost})
+            const returnPost = await Post.find({_id : newPost._id});
+            return res.status(200).json(returnPost[0])
+            
         } else {
             return res.status(500).json({error: "No content provided"})
         }
@@ -132,7 +134,7 @@ module.exports.singlePost = async(req, res) => {
 
 module.exports.feed = async(req, res) => {
 
-    const selfUser = await User.findById(res.locals.user._id).select('following -_id');
+    const selfUser = await User.findById(res.locals.user._id).select('following');
     const page = (req.params.page - 1);
 
     try {
@@ -154,9 +156,11 @@ module.exports.feed = async(req, res) => {
 
         const posterArray = await Post.find({poster: { $in: selfUser.following }})
 
-        let concatArray = _.concat(posterArray, likesArray, repostersArray)
+        const selfUserArray = await Post.find({poster: selfUser._id})
 
-        let finalArray =  _.chunk(feedOrderer(concatArray), 30)
+        let concatArray = _.concat(selfUserArray, posterArray, likesArray, repostersArray)
+
+        let finalArray =  _.chunk(feedOrderer(concatArray), 10)
         
         res.json(finalArray[page])
     } catch(err) {
