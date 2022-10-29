@@ -150,17 +150,31 @@ module.exports.follow = async(req, res) => {
           return res.status(200).json({ error: "You cannot follow yourself" });
         }
       } else {
-        await User.findByIdAndUpdate(res.locals.user._id, {$pull: {following: {$eq: followedUser._id}}});
-        await User.findByIdAndUpdate(req.params.id, {$pull: {followers: {$eq: selfUser._id}}})
-        return res.status(200).json({ msg: "You are now un-following this user" });
+        return res.status(200).json({ msg: "You are already following this user" });
       }
     } else {
       return res.status(200).json({ error: "User does not exist." });
     }
   } catch (err) {
-    return res.json(err)
+   
   }
 };
+
+module.exports.unfollow = async(req,res) => {
+  const selfUser = await User.findById(res.locals.user._id);
+  const followedUser = await User.findById(req.params.id);
+  try {
+    if (selfUser && followedUser) {
+      await User.findByIdAndUpdate(res.locals.user._id, {$pull: {following: {$eq: followedUser._id}}});
+      await User.findByIdAndUpdate(req.params.id, {$pull: {followers: {$eq: selfUser._id}}})
+      return res.status(200).json({ msg: "You are now un-following this user" });
+    }else {
+      return res.status(200).json({ error: "User does not exist." });
+    }
+}catch(err){
+  return res.json(err)
+}
+}
 
 
 module.exports.repost = async(req, res) => {

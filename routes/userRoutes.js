@@ -12,6 +12,7 @@ router.put("/editbio", checkUser, userController.editUserBio)
 router.get("/users", checkUser, userController.getAllUsers)
 router.put("/addprofilepic", checkUser, userController.addProfilePic)
 router.patch("/follow/:id", checkUser, userController.follow)
+router.patch("/unfollow/:id", checkUser, userController.unfollow)
 router.post("/repost/:post_id", checkUser, userController.repost)
 
 module.exports = router

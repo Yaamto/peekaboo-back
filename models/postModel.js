@@ -6,7 +6,7 @@ const PostSchema = new Schema(
     poster: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
-      autopopulate: {select: "_id username isAdmin"}
+      autopopulate: {select: "_id username isAdmin profilePic"}
     },
     content: {
       type: String,
